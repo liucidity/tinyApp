@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const { redirect } = require('express/lib/response');
 const app = express();
 const PORT = 8080;
 
@@ -57,46 +58,63 @@ app.use(cookieParser());
 
 // ------------------------------------------------- ROUTING
 
-// READS
-app.get('/', (req, res) => {
-  res.send('Hello!');
-});
+// ------------------------- READS
 
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
-
+// REGISTRATION / LOGIN
 app.get('/register', (req, res) => {
+  if (req.cookies['userID']) {
+    res.redirect('/urls');
+  }
+
   const templateVars = { user: users[req.cookies['userID']] };
   res.render('account_registration', templateVars);
 });
 
 app.get('/login', (req, res) => {
+  if (req.cookies['userID']) {
+    res.redirect('/urls');
+  }
+
   const templateVars = { user: users[req.cookies['userID']] };
   res.render('account_login', templateVars);
 });
 
+// CREATE NEW URL
 app.get('/urls/new', (req, res) => {
+  if (!req.cookies['userID']) {
+    res.redirect('/login');
+  }
+
   const templateVars = { user: users[req.cookies['userID']] };
   res.render('urls_new', templateVars);
 });
 
+// ALL CREATED URLS
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, user: users[req.cookies['userID']] };
   res.render('urls_index', templateVars);
 });
 
+// INDIVIDUAL URL / EDITING
 app.get('/urls/:id', (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user: users[req.cookies['userID']] }; //wtvr id in our /:id route is passed into our object through req.params.key (key being id due to :id)
   res.render('urls_show', templateVars);
 });
 
+// REDIRECTION TO LONGURL
 app.get('/u/:id', (req, res) => {
+  if (!urlDatabase[req.params.id]) {
+    res.status(400).send("shortened URL does not exist")
+  }
+
+
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
 
-// WRITES
+// ------------------------- WRITES
+
+// REGISTRATION / LOGIN
 app.post('/register', (req, res) => {
   let userID = generateRandomString();
   let email = req.body.email;
@@ -113,22 +131,6 @@ app.post('/register', (req, res) => {
 
   users[userID] = { id: userID, email: email, password: password };
   res.cookie('userID', userID);
-  res.redirect('/urls');
-});
-app.post('/urls', (req, res) => {
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
-  res.redirect(`/urls/${shortURL}`);
-
-});
-
-app.post('/urls/:id/delete', (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect('/urls');
-});
-
-app.post('/urls/:id', (req, res) => {
-  urlDatabase[req.params.id] = req.body.updateLongURL;
   res.redirect('/urls');
 });
 
@@ -150,6 +152,31 @@ app.post('/logout', (req, res) => {
   res.clearCookie('userID');
   res.redirect('/urls');
 });
+
+// CREATES NEW URL
+app.post('/urls', (req, res) => {
+  if (!req.cookies['userID']) {
+    res.status(400).send("Please Login or register to create TinyURL");
+  }
+
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL;
+  res.redirect(`/urls`);
+
+});
+
+// DELETE URL ENTRY
+app.post('/urls/:id/delete', (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect('/urls');
+});
+
+// UPDATE URL ENTRY
+app.post('/urls/:id', (req, res) => {
+  urlDatabase[req.params.id] = req.body.updateLongURL;
+  res.redirect('/urls');
+});
+
 
 // ------------------------------------------------- PORT LISTEN
 app.listen(PORT, () => {
