@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
 
@@ -154,6 +155,7 @@ app.post('/register', (req, res) => {
   let userID = generateRandomString();
   let email = req.body.email;
   let password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   //check if email or password field is empty
   if (!email || !password) {
@@ -164,14 +166,14 @@ app.post('/register', (req, res) => {
     res.status(400).send('user Email already registered');
   }
 
-  users[userID] = { id: userID, email: email, password: password };
+  users[userID] = { id: userID, email: email, password: hashedPassword };
   res.cookie('userID', userID);
   res.redirect('/urls');
 });
 
 app.post('/login', (req, res) => {
   if (findEmail(req.body.email)) {
-    if (req.body.password === findEmail(req.body.email).password) {
+    if (bcrypt.compareSync(req.body.password, findEmail(req.body.email).password)) {
 
       res.cookie('userID', findEmail(req.body.email).id);
       res.redirect('/urls');
@@ -235,11 +237,7 @@ app.post('/urls', (req, res) => {
 
   }
 
-
 });
-
-
-
 
 // ------------------------------------------------- PORT LISTEN
 app.listen(PORT, () => {
