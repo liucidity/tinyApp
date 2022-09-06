@@ -68,7 +68,11 @@ const users = {
 // ------------------------------------------------- SETUP MIDDLEWARE
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieSession());
+app.use(cookieSession({
+  name: 'userID',
+  keys: ['key1'],
+
+}));
 
 
 // ------------------------------------------------- ROUTING
@@ -77,41 +81,41 @@ app.use(cookieSession());
 
 // REGISTRATION / LOGIN
 app.get('/register', (req, res) => {
-  if (req.cookies['userID']) {
+  if (req.session['userID']) {
     res.redirect('/urls');
   }
 
-  const templateVars = { user: users[req.cookies['userID']] };
+  const templateVars = { user: users[req.session['userID']] };
   res.render('account_registration', templateVars);
 });
 
 app.get('/login', (req, res) => {
-  if (req.cookies['userID']) {
+  if (req.session['userID']) {
     res.redirect('/urls');
   }
 
-  const templateVars = { user: users[req.cookies['userID']] };
+  const templateVars = { user: users[req.session['userID']] };
   res.render('account_login', templateVars);
 });
 
 // CREATE NEW URL
 app.get('/urls/new', (req, res) => {
-  if (!req.cookies['userID']) {
+  if (!req.session['userID']) {
     res.redirect('/login');
   }
 
-  const templateVars = { user: users[req.cookies['userID']] };
+  const templateVars = { user: users[req.session['userID']] };
   res.render('urls_new', templateVars);
 });
 
 // ALL CREATED URLS
 app.get('/urls', (req, res) => {
-  if (!req.cookies['userID']) {
-    const templateVars = { urls: urlDatabase, user: users[req.cookies['userID']] };
+  if (!req.session['userID']) {
+    const templateVars = { urls: urlDatabase, user: users[req.session['userID']] };
     res.render('urls_index', templateVars);
   } else {
-    const templateVars = { urls: urlsForUserID(req.cookies['userID']), user: users[req.cookies['userID']] };
-    console.log(urlsForUserID(req.cookies['userID']));
+    const templateVars = { urls: urlsForUserID(req.session['userID']), user: users[req.session['userID']] };
+    console.log(urlsForUserID(req.session['userID']));
     res.render('urls_index', templateVars);
   }
 });
@@ -124,7 +128,7 @@ app.get('/urls/:id', (req, res) => {
   if (!(Object.keys(urlDatabase).includes(req.params.id))) {
     res.status(400).send('This URL has not been created yet');
   } else {
-    if (req.cookies['userID'] !== urlDatabase[`${req.params.id}`].userID) {
+    if (req.session['userID'] !== urlDatabase[`${req.params.id}`].userID) {
       // TODO: change page to not send HTML only
       res.status(400).send("You do not own this URL.");
 
@@ -133,7 +137,7 @@ app.get('/urls/:id', (req, res) => {
 
   }
 
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], urls: urlDatabase, user: users[req.cookies['userID']] }; //wtvr id in our /:id route is passed into our object through req.params.key (key being id due to :id)
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], urls: urlDatabase, user: users[req.session['userID']] }; //wtvr id in our /:id route is passed into our object through req.params.key (key being id due to :id)
   res.render('urls_show', templateVars);
 });
 
@@ -167,7 +171,7 @@ app.post('/register', (req, res) => {
   }
 
   users[userID] = { id: userID, email: email, password: hashedPassword };
-  res.cookie('userID', userID);
+  req.session.userID = userID;
   res.redirect('/urls');
 });
 
@@ -175,7 +179,7 @@ app.post('/login', (req, res) => {
   if (findEmail(req.body.email)) {
     if (bcrypt.compareSync(req.body.password, findEmail(req.body.email).password)) {
 
-      res.cookie('userID', findEmail(req.body.email).id);
+      req.session.userID = findEmail(req.body.email).id;
       res.redirect('/urls');
     } else {
       res.status(400).send("email or password is not correct");
@@ -197,7 +201,7 @@ app.post('/urls/:id', (req, res) => {
     res.status(400).send("This URL does not exist");
   }
 
-  if (req.cookies['userID'] !== urlDatabase[req.params.id].userID) {
+  if (req.session['userID'] !== urlDatabase[req.params.id].userID) {
     res.status(400).send("You do not have access to this URL");
   } else {
 
@@ -213,7 +217,7 @@ app.post('/urls/:id/delete', (req, res) => {
     res.status(400).send("This URL does not exist");
   }
 
-  if (req.cookies['userID'] !== urlDatabase[`${req.params.id}`].userID) {
+  if (req.session['userID'] !== urlDatabase[`${req.params.id}`].userID) {
     res.status(400).send("You do not have permission to delete this URL");
   } else {
 
@@ -227,12 +231,12 @@ app.post('/urls/:id/delete', (req, res) => {
 // CREATES NEW URL
 app.post('/urls', (req, res) => {
 
-  if (!req.cookies['userID']) {
+  if (!req.session['userID']) {
     res.status(400).send("Please Login or register to create TinyURL");
   } else {
 
     const shortURL = generateRandomString();
-    urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies['userID'] };
+    urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session['userID'] };
     res.redirect(`/urls`);
 
   }
