@@ -70,6 +70,10 @@ app.get('/register', (req, res) => {
   res.render('account_registration');
 });
 
+app.get('/login', (req, res) => {
+  res.render('account_login');
+});
+
 app.get('/urls/new', (req, res) => {
   const templateVars = { username: req.cookies["username"], user: users[req.cookies['userID']] };
   res.render('urls_new', templateVars);
@@ -127,8 +131,17 @@ app.post('/urls/:id', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('userID', req.body.userID);
-  res.redirect('/urls');
+  if (findEmail(req.body.email)) {
+    if (req.body.password === findEmail(req.body.email).password) {
+
+      res.cookie('userID', findEmail(req.body.email).id);
+      res.redirect('/urls');
+    } else {
+      res.status(400).send("email or password is not correct");
+    }
+    res.status(400).send("email or password is not correct");
+  }
+  res.status(400).send("email or password is not correct");
 });
 
 app.post('/logout', (req, res) => {
