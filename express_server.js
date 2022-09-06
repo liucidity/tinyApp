@@ -67,25 +67,27 @@ app.get('/urls.json', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  res.render('account_registration');
+  const templateVars = { user: users[req.cookies['userID']] };
+  res.render('account_registration', templateVars);
 });
 
 app.get('/login', (req, res) => {
-  res.render('account_login');
+  const templateVars = { user: users[req.cookies['userID']] };
+  res.render('account_login', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  const templateVars = { username: req.cookies["username"], user: users[req.cookies['userID']] };
+  const templateVars = { user: users[req.cookies['userID']] };
   res.render('urls_new', templateVars);
 });
 
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"], user: users[req.cookies['userID']] };
+  const templateVars = { urls: urlDatabase, user: users[req.cookies['userID']] };
   res.render('urls_index', templateVars);
 });
 
 app.get('/urls/:id', (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"], user: users[req.cookies['userID']] }; //wtvr id in our /:id route is passed into our object through req.params.key (key being id due to :id)
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user: users[req.cookies['userID']] }; //wtvr id in our /:id route is passed into our object through req.params.key (key being id due to :id)
   res.render('urls_show', templateVars);
 });
 
