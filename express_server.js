@@ -41,6 +41,10 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+app.get('/register', (req, res) => {
+  res.render('account_registration');
+});
+
 app.get('/urls/new', (req, res) => {
   const templateVars = { username: req.cookies["username"] };
   res.render('urls_new');
