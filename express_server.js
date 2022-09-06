@@ -20,6 +20,17 @@ const generateRandomString = function () {
   return generatedShort;
 };
 
+const findEmail = function (registrationEmail) {
+  //retuns entire user object if email is found or return null
+  for (const user in users) {
+    if (registrationEmail === users[user].email) {
+      console.log(users[user].email);
+      return users[user];
+    }
+  }
+  return null;
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -84,6 +95,16 @@ app.post('/register', (req, res) => {
   let userID = generateRandomString();
   let email = req.body.email;
   let password = req.body.password;
+
+  //check if email or password field is empty
+  if (!email || !password) {
+    res.status(400).send('Please enter both email and password');
+  }
+
+  if (findEmail(email)) {
+    res.status(400).send('user Email already registered');
+  }
+
   users[userID] = { id: userID, email: email, password: password };
   res.cookie('userID', userID);
   res.redirect('/urls');
