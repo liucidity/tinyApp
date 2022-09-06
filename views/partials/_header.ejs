@@ -10,5 +10,34 @@
         <a href="/urls/new" class="nav-item nav-link">Create New URL</a>
       </div>
     </div>
+
+    <div>
+      <% if (!username) {%>
+        <div>
+          <form class="form-inline" action="/login" method="post">
+
+            <input class="form-control" type="text" name="Username" placeholder="username.." />
+            <button class="btn btn-primary" type="submit">Submit</button>
+          </form>
+        </div>
+
+        <% } else { %>
+          <div class="collapse navbar-collapse" id="navbarText">
+            <span class="navbar-text">Logged in as: <%= username %></span>
+            <form class="form-inline" action="/logout" method="post">
+              <button class="btn btn-primary" type="submit">Logout</button>
+            </form>
+          </div>
+          <%} %>
+    </div>
+    </div>
+
+    <!-- <div>
+      <form action="/login" method="post">
+        <label for="username">Log in:</label>
+        <input type="text" name="username" placeholder="username.." />
+        <button type="submit">Submit</button>
+      </form>
+    </div> -->
   </nav>
 </header>
