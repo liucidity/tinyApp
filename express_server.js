@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
+const { findEmail } = require('./helpers');
 const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
@@ -21,15 +22,6 @@ const generateRandomString = function () {
   return generatedShort;
 };
 
-const findEmail = function (registrationEmail) {
-  //retuns entire user object if email is found or return null
-  for (const user in users) {
-    if (registrationEmail === users[user].email) {
-      return users[user];
-    }
-  }
-  return null;
-};
 
 const urlsForUserID = function (userID) {
   let urls = {};
@@ -165,28 +157,27 @@ app.post('/register', (req, res) => {
   if (!email || !password) {
     res.status(400).send('Please enter both email and password');
   }
-
-  if (findEmail(email)) {
+  if (findEmail(email, users)) {
     res.status(400).send('user Email already registered');
+  } else {
+    users[userID] = { id: userID, email: email, password: hashedPassword };
+    req.session.userID = userID;
+    res.redirect('/urls');
+
   }
 
-  users[userID] = { id: userID, email: email, password: hashedPassword };
-  req.session.userID = userID;
-  res.redirect('/urls');
 });
 
 app.post('/login', (req, res) => {
-  if (findEmail(req.body.email)) {
-    if (bcrypt.compareSync(req.body.password, findEmail(req.body.email).password)) {
+  if (findEmail(req.body.email, users)) {
+    if (bcrypt.compareSync(req.body.password, findEmail(req.body.email, users).password)) {
 
-      req.session.userID = findEmail(req.body.email).id;
+      req.session.userID = findEmail(req.body.email, users).id;
       res.redirect('/urls');
     } else {
       res.status(400).send("email or password is not correct");
     }
-    res.status(400).send("email or password is not correct");
   }
-  res.status(400).send("email or password is not correct");
 });
 
 app.post('/logout', (req, res) => {
