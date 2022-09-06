@@ -8,4 +8,27 @@ const findEmail = function (registrationEmail, database) {
   return null;
 };
 
-module.exports = { findEmail };
+const urlsForUserID = function (userID, database) {
+  let urls = {};
+  for (const url in database) {
+    if (userID === database[url].userID) {
+      urls[url] = database[url].longURL;
+    }
+  }
+  return urls;
+};
+
+const generateRandomString = function () {
+  let generatedShort = '';
+  const stringLength = 6;
+  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
+
+  for (let i = 0; i < stringLength; i++) {
+    generatedShort += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return generatedShort;
+};
+
+module.exports = { findEmail, urlsForUserID, generateRandomString };
