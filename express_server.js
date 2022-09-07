@@ -1,4 +1,5 @@
 const { findEmail, urlsForUserID, generateRandomString } = require('./helpers');
+const { urlDatabase, users } = require('./data');
 const express = require('express');
 const methodOverride = require('method-override');
 const morgan = require('morgan');
@@ -8,32 +9,6 @@ const app = express();
 const PORT = 8080;
 
 app.set('view engine', 'ejs');
-
-// ------------------------------------------------- DATABASE / GLOBAL
-
-const urlDatabase = {
-  "b2xVn2": {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "userRandomID",
-  },
-  "9sm5xK": {
-    longURL: "http://www.google.com",
-    userID: "userRandomID",
-  }
-};
-
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "a@a.com",
-    password: "1234",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "b@b.com",
-    password: "4321",
-  },
-};
 
 // ------------------------------------------------- SETUP MIDDLEWARE
 app.use(morgan('dev'));
