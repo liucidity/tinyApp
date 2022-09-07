@@ -80,6 +80,10 @@ app.get('/u/:id', (req, res) => {
     res.status(400).send("shortened URL does not exist");
   }
 
+  //each time link has been visited increase counter
+  urlDatabase[req.params.id].visitCount += 1;
+
+
   const longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
 });
@@ -152,6 +156,8 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+
+
 // UPDATE URL ENTRY
 app.put('/urls/:id', (req, res) => {
   console.log(Object.keys(urlDatabase).includes(req.params.id));
@@ -197,6 +203,7 @@ app.post('/urls', (req, res) => {
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
       userID: req.session['userID'],
+      visitCount: 0,
     };
     res.redirect(`/urls/${shortURL}`);
 

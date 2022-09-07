@@ -2,10 +2,12 @@ const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userID: "userRandomID",
+    visitCount: 0,
   },
   "9sm5xK": {
     longURL: "http://www.google.com",
     userID: "userRandomID",
+    visitCount: 0,
   }
 };
 
@@ -21,5 +23,6 @@ const users = {
     password: "4321",
   },
 };
+
 
 module.exports = { urlDatabase, users };
