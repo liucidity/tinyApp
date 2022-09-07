@@ -1,5 +1,6 @@
 const { findEmail, urlsForUserID, generateRandomString } = require('./helpers');
 const express = require('express');
+const methodOverride = require('method-override');
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
@@ -41,7 +42,7 @@ app.use(cookieSession({
   name: 'userID',
   keys: ['key1'],
 }));
-
+app.use(methodOverride('_method'));
 
 
 // ------------------------------------------------- ROUTING
@@ -177,7 +178,7 @@ app.post('/logout', (req, res) => {
 });
 
 // UPDATE URL ENTRY
-app.post('/urls/:id', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   console.log(Object.keys(urlDatabase).includes(req.params.id));
 
   if (!Object.keys(urlDatabase).includes(req.params.id)) {
@@ -194,7 +195,7 @@ app.post('/urls/:id', (req, res) => {
 });
 
 // DELETE URL ENTRY
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id', (req, res) => {
   if (!Object.keys(urlDatabase).includes(req.params.id)) {
     res.status(400).send("This URL does not exist");
   }

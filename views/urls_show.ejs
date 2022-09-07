@@ -25,7 +25,7 @@
           </p>
     </div>
     <div class="card-footer text-muted">
-      <form class="text-center" action="/urls/<%= id %>" method="post">
+      <form class="text-center" action="/urls/<%= id %>?_method=PUT" method="post">
         <label for="updateLongURL">New URL</label>
         <input name="updateLongURL" type="text" style="width: 300px; margin: 1em" placeholder="Enter URL...">
         <button type="submit" class="btn btn-primary">Submit</button>
