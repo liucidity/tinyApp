@@ -82,6 +82,10 @@ app.get('/u/:id', (req, res) => {
 
   //each time link has been visited increase counter
   urlDatabase[req.params.id].visitCount += 1;
+  if (req.session.isNew) {
+    urlDatabase[req.params.id].uniqueVisits += 1;
+  }
+
 
 
   const longURL = urlDatabase[req.params.id].longURL;
@@ -204,6 +208,7 @@ app.post('/urls', (req, res) => {
       longURL: req.body.longURL,
       userID: req.session['userID'],
       visitCount: 0,
+      uniqueVisits: 0,
     };
     res.redirect(`/urls/${shortURL}`);
 

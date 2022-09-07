@@ -25,6 +25,8 @@
           </p>
           <p class="card-text text-center">Visits: <%= urls[id].visitCount %>
           </p>
+          <p class="card-text text-center">Unique Visitors: <%= urls[id].uniqueVisits %>
+          </p>
     </div>
     <div class="card-footer text-muted">
       <form class="text-center" action="/urls/<%= id %>?_method=PUT" method="post">
