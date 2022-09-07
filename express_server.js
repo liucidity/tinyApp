@@ -86,7 +86,13 @@ app.get('/u/:id', (req, res) => {
     urlDatabase[req.params.id].uniqueVisits += 1;
   }
 
-
+  const date = new Date();
+  let timestamp = `${date.toString()}`;
+  const visitorID = generateRandomString();
+  urlDatabase[req.params.id].visits.push({
+    timestamp,
+    visitorID,
+  });
 
   const longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
@@ -209,6 +215,7 @@ app.post('/urls', (req, res) => {
       userID: req.session['userID'],
       visitCount: 0,
       uniqueVisits: 0,
+      visits: [],
     };
     res.redirect(`/urls/${shortURL}`);
 

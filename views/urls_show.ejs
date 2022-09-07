@@ -37,6 +37,39 @@
       <% } %>
     </div>
 
+    <div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Timestamp</th>
+            <th scope="col">VisitorID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let count=1; %>
+            <% if (!urls[id].visits) { %>
+              <p>No visitors</p>
+              <% } else { %>
+                <% for (let visit of urls[id].visits) { %>
+                  <tr>
+                    <th scope="row">
+                      <%= count++ %>
+                    </th>
+                    <td>
+                      <%= visit.timestamp %>
+                    </td>
+                    <td>
+                      <%= visit.visitorID %>
+                    </td>
+                  </tr>
+
+                  <% } %>
+                    <% } %>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

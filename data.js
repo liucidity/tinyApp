@@ -4,6 +4,7 @@ const urlDatabase = {
     userID: "userRandomID",
     visitCount: 0,
     uniqueVisits: 0,
+    visits: []
 
   },
   "9sm5xK": {
@@ -11,6 +12,7 @@ const urlDatabase = {
     userID: "userRandomID",
     visitCount: 0,
     uniqueVisits: 0,
+    visits: []
 
   }
 };
